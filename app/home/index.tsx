@@ -24,7 +24,7 @@ const HomeScreen = () => {
   const { top } = useSafeAreaInsets();
   const paddingTop = top > 0 ? top + 10 : 30;
   const [search, setSearch] = useState("");
-  const [filters, setFilters] = useState([]);
+  const [filters, setFilters] = useState<{ [k: string]: string } | null>(null);
   const [images, setImages] = useState<any>([]);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const searchInputRef = useRef<TextInput>(null);
@@ -56,6 +56,37 @@ const HomeScreen = () => {
     modalRef.current?.close();
   };
 
+  const applyFilters = () => {
+    if (filters) {
+      page = 1;
+      setImages([]);
+      let params: ParamsType = {
+        page,
+        ...filters,
+      };
+      if (activeCategory) params.category = activeCategory;
+      if (search) params.q = search;
+      fetchImages(params);
+    }
+    closeFiltersModal();
+  };
+
+  const resetFilters = () => {
+    if (filters) {
+      page = 1;
+      setFilters(null);
+      setImages([]);
+      let params: ParamsType = {
+        page,
+        ...filters,
+      };
+      if (activeCategory) params.category = activeCategory;
+      if (search) params.q = search;
+      fetchImages(params);
+    }
+    closeFiltersModal();
+  };
+
   const handleChangeCategory = (cat: string | null) => {
     setActiveCategory(cat);
     clearSearch();
@@ -63,6 +94,7 @@ const HomeScreen = () => {
     page = 1;
     let params: ParamsType = {
       page,
+      ...filters,
     };
     if (cat) params.category = cat;
     fetchImages(params, false);
@@ -74,7 +106,7 @@ const HomeScreen = () => {
       page = 1;
       setImages([]);
       setActiveCategory(null);
-      fetchImages({ page, q: text });
+      fetchImages({ page, q: text, ...filters });
     }
 
     if (text === "") {
@@ -82,7 +114,7 @@ const HomeScreen = () => {
       searchInputRef.current?.clear();
       setImages([]);
       setActiveCategory(null);
-      fetchImages({ page });
+      fetchImages({ page, ...filters });
     }
   };
 
@@ -153,7 +185,14 @@ const HomeScreen = () => {
       </ScrollView>
 
       {/* filters modal */}
-      <FiltersModal modalRef={modalRef} />
+      <FiltersModal
+        modalRef={modalRef}
+        filters={filters}
+        setFilters={setFilters}
+        onClose={closeFiltersModal}
+        onApply={applyFilters}
+        onReset={resetFilters}
+      />
     </View>
   );
 };

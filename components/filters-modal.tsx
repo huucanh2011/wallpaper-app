@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { RefObject, useMemo } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import React, { Dispatch, RefObject, SetStateAction, useMemo } from "react";
 import {
   BottomSheetBackdropProps,
   BottomSheetModal,
@@ -14,14 +14,26 @@ import Animated, {
 
 import { capitalize, hp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
-import { CommonFilterRow, SectionView } from "./filters-view";
+import { ColorFilterRow, CommonFilterRow, SectionView } from "./filters-view";
 import { data } from "@/constants/data";
 
 type FiltersModalProps = {
   modalRef: RefObject<any>;
+  filters: { [k: string]: string } | null;
+  setFilters: Dispatch<SetStateAction<{ [k: string]: string } | null>>;
+  onClose: () => void;
+  onApply: () => void;
+  onReset: () => void;
 };
 
-const FiltersModal = ({ modalRef }: FiltersModalProps) => {
+const FiltersModal = ({
+  modalRef,
+  filters,
+  setFilters,
+  onClose,
+  onApply,
+  onReset,
+}: FiltersModalProps) => {
   const snapPoints = useMemo(() => ["75%"], []);
 
   // const
@@ -46,11 +58,35 @@ const FiltersModal = ({ modalRef }: FiltersModalProps) => {
               <View key={sectionName}>
                 <SectionView
                   title={title}
-                  content={sectionView({ data: sectionData })}
+                  content={sectionView({
+                    data: sectionData,
+                    filters,
+                    setFilters,
+                    filterName: sectionName,
+                  })}
                 />
               </View>
             );
           })}
+
+          {/* actions */}
+          <View style={styles.buttons}>
+            <Pressable style={styles.resetButton} onPress={onReset}>
+              <Text
+                style={[
+                  styles.buttonText,
+                  { color: theme.colors.neutral(0.9) },
+                ]}
+              >
+                Reset
+              </Text>
+            </Pressable>
+            <Pressable style={styles.applyButton} onPress={onApply}>
+              <Text style={[styles.buttonText, { color: theme.colors.white }]}>
+                Apply
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </BottomSheetView>
     </BottomSheetModal>
@@ -59,9 +95,9 @@ const FiltersModal = ({ modalRef }: FiltersModalProps) => {
 
 const sections = {
   order: (props: any) => <CommonFilterRow {...props} />,
-  orientation: (props: any) => <SectionView {...props} />,
-  type: (props: any) => <SectionView {...props} />,
-  colors: (props: any) => <SectionView {...props} />,
+  orientation: (props: any) => <CommonFilterRow {...props} />,
+  type: (props: any) => <CommonFilterRow {...props} />,
+  colors: (props: any) => <ColorFilterRow {...props} />,
 };
 
 const CustomBackdrop = ({ animatedIndex, style }: BottomSheetBackdropProps) => {
@@ -117,6 +153,35 @@ const styles = StyleSheet.create({
     fontWeight: theme.fontWeights.semibold,
     color: theme.colors.neutral(0.8),
     marginBottom: 5,
+  },
+  buttons: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  resetButton: {
+    flex: 1,
+    backgroundColor: theme.colors.neutral(0.03),
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.radius.md,
+    borderCurve: "continuous",
+    borderWidth: 2,
+    borderColor: theme.colors.grayBG,
+  },
+  applyButton: {
+    flex: 1,
+    backgroundColor: theme.colors.neutral(0.8),
+    padding: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: theme.radius.md,
+    borderCurve: "continuous",
+  },
+  buttonText: {
+    fontSize: hp(2.2),
   },
 });
 
