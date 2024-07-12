@@ -1,10 +1,10 @@
 import axios from "axios";
 
-const API_KEY = process.env.API_KEY;
+const API_KEY = process.env.EXPO_PUBLIC_API_URL;
 
 const apiUrl = `https://pixabay.com/api/?key=${API_KEY}`;
 
-type ParamsType = {
+export type ParamsType = {
   [key: string]: string | boolean | number;
 };
 
@@ -14,8 +14,10 @@ const formatUrl = (params: ParamsType) => {
   let paramKeys = Object.keys(params);
   paramKeys.map((key) => {
     let value = key === "q" ? encodeURIComponent(params[key]) : params[key];
-    url += `$${key}=${value}`;
+    url += `&${key}=${value}`;
   });
+  console.log("url", url);
+
   return url;
 };
 

@@ -13,3 +13,33 @@ export const hp = (percentage: number) => {
 
   return (percentage * height) / 100;
 };
+
+export const getColumnCount = () => {
+  if (deviceWith >= 1024) {
+    // desktop
+    return 4;
+  } else if (deviceWith >= 768) {
+    // tablet
+    return 3;
+  } else {
+    // phone
+    return 2;
+  }
+};
+
+export const getImageSize = (width: number, height: number) => {
+  if (width > height) {
+    // landscape
+    return 250;
+  } else if (width < height) {
+    // portrait
+    return 300;
+  } else {
+    // square
+    return 200;
+  }
+};
+
+export const capitalize = (str: string) => {
+  return str.replace(/\b\w/g, (l) => l.toUpperCase());
+};
