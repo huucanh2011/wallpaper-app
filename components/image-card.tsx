@@ -1,16 +1,19 @@
 import { Pressable, StyleSheet } from "react-native";
 import React from "react";
 import { Image } from "expo-image";
+import { ExpoRouter } from "expo-router/types/expo-router";
+
 import { getImageSize, wp } from "@/helpers/common";
 import { theme } from "@/constants/theme";
 
 type Props = {
+  router: ExpoRouter.Router;
   item: any;
   index: number;
   columns: number;
 };
 
-const ImageCard = ({ item, index, columns }: Props) => {
+const ImageCard = ({ router, item, index, columns }: Props) => {
   const isLastInRow = () => {
     return (index + 1) % columns === 0;
   };
@@ -21,7 +24,12 @@ const ImageCard = ({ item, index, columns }: Props) => {
   };
 
   return (
-    <Pressable style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}>
+    <Pressable
+      onPress={() =>
+        router.push({ pathname: "home/image", params: { ...item } })
+      }
+      style={[styles.imageWrapper, !isLastInRow() && styles.spacing]}
+    >
       <Image
         style={[styles.image, getImageHeight()]}
         source={{ uri: item?.webformatURL }}
